@@ -158,47 +158,67 @@ function shuffle(array) {
   return array;
 }
 
-let passiveIndex = 0;
+const passiveQuestions = [
+  { q: "The documents ______ to the office yesterday.", a: "were brought", choices: ["are brought", "were brought", "brought", "had bring"] },
+  { q: "A new bridge ______ across the river.", a: "has been built", choices: ["has been built", "was grow", "is building", "had build"] },
+  { q: "The homework ______ already ______ by the students.", a: "has / been done", choices: ["is / gave", "has / done", "has / been done", "was / eat"] },
+  { q: "The cake ______ by my sister this morning.", a: "was baked", choices: ["wrote", "was baked", "is draw", "were taken"] },
+  { q: "The email ______ before the meeting started.", a: "had been sent", choices: ["had been sent", "was steal", "has wrote", "is sent"] },
+  { q: "All the money ______ last night.", a: "was stolen", choices: ["was steal", "was stolen", "were lost", "taken"] },
+  { q: "The book ______ into many languages.", a: "has been translated", choices: ["has made", "is speaking", "has been translated", "had thrown"] },
+  { q: "The invitation cards ______ by the designer yesterday.", a: "were designed", choices: ["chosen", "were build", "were designed", "has been written"] },
+  { q: "My phone ______ while I was at the gym.", a: "was lost", choices: ["is lost", "was lost", "were hidden", "had take"] },
+  { q: "All the files ______ carefully before being submitted.", a: "were checked", choices: ["were checked", "was kept", "had catch", "is made"] },
+  { q: "The song ______ by Adele.", a: "was sung", choices: ["is sang", "was sung", "has gave", "sang"] },
+  { q: "The room ______ every day.", a: "is cleaned", choices: ["breaks", "is cleaned", "was known", "has written"] },
+  { q: "All the clothes ______ by the time we arrived.", a: "were folded", choices: ["were found", "were folded", "had taken", "are worn"] },
+  { q: "The results ______ on the website yesterday.", a: "were posted", choices: ["put", "were posted", "has been made", "are sent"] },
+  { q: "The movie ______ in 2001.", a: "was released", choices: ["was released", "has shown", "is given", "made"] },
+  { q: "A message ______ on the board.", a: "was left", choices: ["left", "was left", "is grown", "has eat"] },
+  { q: "The thief ______ by the police last night.", a: "was caught", choices: ["caught", "is caught", "was caught", "has throw"] },
+  { q: "The final decision ______ yet.", a: "has not been made", choices: ["has not been made", "is not taken", "has not wrote", "did not write"] },
+  { q: "All the cookies ______ before we arrived.", a: "had been eaten", choices: ["are eaten", "had been eaten", "have took", "was wore"] },
+  { q: "These problems ______ seriously by the team.", a: "are being considered", choices: ["is considered", "has been taken", "are being considered", "were being win"] },
+];
+
+let passivePool = [];
 let passiveRetry = [];
 let passiveCorrect = 0;
-let passiveTotalTime = 0;
 let passiveRetries = 0;
 let passiveTimer;
 
 function initPassiveGame() {
-  passiveIndex = 0;
+  passivePool = [...passiveQuestions];
+  shuffle(passivePool);
   passiveRetry = [];
   passiveCorrect = 0;
-  passiveTotalTime = 0;
   passiveRetries = 0;
-  shuffle(passiveQuestions);
   showScreen("passive");
   askNextPassive();
 }
 
 function askNextPassive() {
-  if (passiveIndex >= passiveQuestions.length) {
+  if (passivePool.length === 0) {
     if (passiveRetry.length > 0) {
-      passiveQuestions.splice(0, passiveQuestions.length, ...passiveRetry);
+      passivePool = [...passiveRetry];
+      shuffle(passivePool);
       passiveRetry = [];
-      passiveIndex = 0;
     } else {
       showPassiveResults();
       return;
     }
   }
 
-  const q = passiveQuestions[passiveIndex];
+  const q = passivePool[0];
   document.getElementById("question-text").textContent = q.q;
-  document.getElementById("question-progress").textContent = `Q ${passiveCorrect + 1}/20`;
+  document.getElementById("question-progress").textContent = `Remaining: ${passivePool.length}`;
 
   const choiceBox = document.getElementById("choices");
   choiceBox.innerHTML = "";
   q.choices.forEach(choice => {
     const btn = document.createElement("button");
     btn.textContent = choice;
-    btn.className = "";
-    btn.onclick = () => handlePassiveSelection(btn, choice);
+    btn.onclick = () => handlePassiveSelection(btn, choice, q);
     choiceBox.appendChild(btn);
   });
 
@@ -212,38 +232,33 @@ function askNextPassive() {
       clearInterval(passiveTimer);
       passiveRetries++;
       passiveRetry.push(q);
-      // Disable buttons
-      document.querySelectorAll("#choices button").forEach(b => b.disabled = true);
+      passivePool.shift();
       setTimeout(() => {
-        passiveIndex++;
         askNextPassive();
-      }, 1000);
+      }, 800);
     }
   }, 1000);
 }
 
-function handlePassiveSelection(btn, choice) {
+function handlePassiveSelection(btn, choice, q) {
   clearInterval(passiveTimer);
-  const q = passiveQuestions[passiveIndex];
   const buttons = document.querySelectorAll("#choices button");
   buttons.forEach(b => b.disabled = true);
-  btn.classList.add("selected");
 
   if (choice === q.a) {
     btn.classList.add("correct");
     passiveCorrect++;
-    passiveIndex++;
+    passivePool.shift();
     setTimeout(askNextPassive, 800);
   } else {
     btn.classList.add("wrong");
-    passiveRetries++;
-    passiveRetry.push(q);
-    // Show correct answer
     buttons.forEach(b => {
       if (b.textContent === q.a) b.classList.add("correct");
     });
+    passiveRetries++;
+    passiveRetry.push(q);
+    passivePool.shift();
     setTimeout(() => {
-      passiveIndex++;
       askNextPassive();
     }, 1500);
   }
@@ -251,6 +266,5 @@ function handlePassiveSelection(btn, choice) {
 
 function showPassiveResults() {
   showScreen("result");
-  document.getElementById("results-summary").innerHTML =
-    `✅ Finished Passive Voice!<br>Correct: ${passiveCorrect}/20<br>Retries: ${passiveRetries}`;
+  document.getElementById("results-summary").innerHTML = `✅ Finished Passive Voice!<br>Correct: ${passiveCorrect}/${passiveQuestions.length}<br>Retries: ${passiveRetries}`;
 }

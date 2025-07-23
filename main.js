@@ -210,14 +210,16 @@ function askNextPassive() {
 
   const q = passiveQueue[0];
   document.getElementById("question-text").textContent = q.q;
-  document.getElementById("question-progress").textContent = `Question ${passiveTotal + 1}`;
+  document.getElementById("question-progress").textContent = `Question ${passiveTotal + 1} / ${passiveQuestions.length}`;
 
   const choiceBox = document.getElementById("choices");
   choiceBox.innerHTML = "";
+
   q.choices.forEach(choice => {
     const btn = document.createElement("button");
     btn.textContent = choice;
     btn.className = "choice-btn";
+    btn.disabled = false;
     btn.onclick = () => handlePassiveSelection(btn, choice, q);
     choiceBox.appendChild(btn);
   });
@@ -230,41 +232,60 @@ function askNextPassive() {
     document.getElementById("timer-passive").textContent = timeLeft;
     if (timeLeft <= 0) {
       clearInterval(passiveTimer);
-      passiveRetry.push(q);
-      passiveQueue.shift();
-      passiveTotal++;
-      setTimeout(askNextPassive, 800);
+      handleTimeOutPassive(q);
     }
   }, 1000);
 }
 
-function handlePassiveSelection(btn, choice, q) {
+function handlePassiveSelection(selectedBtn, choice, question) {
   clearInterval(passiveTimer);
   const buttons = document.querySelectorAll("#choices button");
-  buttons.forEach(b => b.disabled = true);
+  buttons.forEach(btn => btn.disabled = true);
 
-  if (choice === q.a) {
-    btn.classList.add("correct");
+  if (choice === question.a) {
+    selectedBtn.classList.add("correct");
     passiveCorrect++;
   } else {
-    btn.classList.add("wrong");
-    buttons.forEach(b => {
-      if (b.textContent === q.a) b.classList.add("correct");
+    selectedBtn.classList.add("wrong");
+    // Highlight correct button
+    buttons.forEach(btn => {
+      if (btn.textContent === question.a) {
+        btn.classList.add("correct");
+      }
     });
-    passiveRetry.push(q);
+    passiveRetry.push(question);
   }
 
   passiveQueue.shift();
   passiveTotal++;
+
+  setTimeout(askNextPassive, 1200);
+}
+
+function handleTimeOutPassive(question) {
+  const buttons = document.querySelectorAll("#choices button");
+  buttons.forEach(btn => btn.disabled = true);
+  // Highlight correct answer on timeout
+  buttons.forEach(btn => {
+    if (btn.textContent === question.a) {
+      btn.classList.add("correct");
+    }
+  });
+
+  passiveRetry.push(question);
+  passiveQueue.shift();
+  passiveTotal++;
+
   setTimeout(askNextPassive, 1200);
 }
 
 function showPassiveResults() {
   showScreen("result");
-  document.getElementById("results-summary").innerHTML = `✅ Finished Passive Voice!<br>Correct: ${passiveCorrect}/${passiveTotal}<br>Retries: ${passiveRetry.length}`;
+  // Align with participle game reporting style (total correct, total questions, retries)
+  document.getElementById("results-summary").innerHTML = `
+    ✅ Finished Passive Voice!<br>
+    Correct: ${passiveCorrect} / ${passiveQuestions.length}<br>
+    Retries: ${passiveRetry.length}
+  `;
 }
 
-function showPassiveResults() {
-  showScreen("result");
-  document.getElementById("results-summary").innerHTML = `✅ Finished Passive Voice!<br>Correct: ${passiveCorrect}/${passiveQuestions.length}<br>Retries: ${passiveRetries}`;
-}

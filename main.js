@@ -181,43 +181,43 @@ const passiveQuestions = [
   { q: "These problems ______ seriously by the team.", a: "are being considered", choices: ["is considered", "has been taken", "are being considered", "were being win"] },
 ];
 
-let passivePool = [];
+let passiveQueue = [];
 let passiveRetry = [];
 let passiveCorrect = 0;
-let passiveRetries = 0;
+let passiveTotal = 0;
 let passiveTimer;
 
 function initPassiveGame() {
-  passivePool = [...passiveQuestions];
-  shuffle(passivePool);
+  passiveQueue = [...passiveQuestions];
+  shuffle(passiveQueue);
   passiveRetry = [];
   passiveCorrect = 0;
-  passiveRetries = 0;
+  passiveTotal = 0;
   showScreen("passive");
   askNextPassive();
 }
 
 function askNextPassive() {
-  if (passivePool.length === 0) {
+  if (passiveQueue.length === 0) {
     if (passiveRetry.length > 0) {
-      passivePool = [...passiveRetry];
-      shuffle(passivePool);
+      passiveQueue = [...passiveRetry];
+      shuffle(passiveQueue);
       passiveRetry = [];
     } else {
-      showPassiveResults();
-      return;
+      return showPassiveResults();
     }
   }
 
-  const q = passivePool[0];
+  const q = passiveQueue[0];
   document.getElementById("question-text").textContent = q.q;
-  document.getElementById("question-progress").textContent = `Remaining: ${passivePool.length}`;
+  document.getElementById("question-progress").textContent = `Question ${passiveTotal + 1}`;
 
   const choiceBox = document.getElementById("choices");
   choiceBox.innerHTML = "";
   q.choices.forEach(choice => {
     const btn = document.createElement("button");
     btn.textContent = choice;
+    btn.className = "choice-btn";
     btn.onclick = () => handlePassiveSelection(btn, choice, q);
     choiceBox.appendChild(btn);
   });
@@ -230,12 +230,10 @@ function askNextPassive() {
     document.getElementById("timer-passive").textContent = timeLeft;
     if (timeLeft <= 0) {
       clearInterval(passiveTimer);
-      passiveRetries++;
       passiveRetry.push(q);
-      passivePool.shift();
-      setTimeout(() => {
-        askNextPassive();
-      }, 800);
+      passiveQueue.shift();
+      passiveTotal++;
+      setTimeout(askNextPassive, 800);
     }
   }, 1000);
 }
@@ -248,20 +246,22 @@ function handlePassiveSelection(btn, choice, q) {
   if (choice === q.a) {
     btn.classList.add("correct");
     passiveCorrect++;
-    passivePool.shift();
-    setTimeout(askNextPassive, 800);
   } else {
     btn.classList.add("wrong");
     buttons.forEach(b => {
       if (b.textContent === q.a) b.classList.add("correct");
     });
-    passiveRetries++;
     passiveRetry.push(q);
-    passivePool.shift();
-    setTimeout(() => {
-      askNextPassive();
-    }, 1500);
   }
+
+  passiveQueue.shift();
+  passiveTotal++;
+  setTimeout(askNextPassive, 1200);
+}
+
+function showPassiveResults() {
+  showScreen("result");
+  document.getElementById("results-summary").innerHTML = `✅ Finished Passive Voice!<br>Correct: ${passiveCorrect}/${passiveTotal}<br>Retries: ${passiveRetry.length}`;
 }
 
 function showPassiveResults() {

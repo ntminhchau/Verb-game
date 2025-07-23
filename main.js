@@ -187,19 +187,40 @@ const passiveQuestions = [
 let passiveQueue = [];
 let passiveRetry = [];
 let passiveCorrect = 0;
-let passiveTotal = 0;
+let passiveRetries = 0;
 let passiveTimer;
 
+// ===================== Start Passive Game =====================
+function startGame(type) {
+  document.querySelectorAll(".game-screen, .home, .result-screen").forEach(s => s.classList.remove("active"));
+
+  if (type === "passive") {
+    initPassiveGame();
+    document.getElementById("passive-game").classList.add("active");
+    askNextPassive();
+  } else if (type === "participle") {
+    // Call your participle game setup here
+  }
+}
+
+// ===================== Init Passive =====================
 function initPassiveGame() {
   passiveQueue = [...passiveQuestions];
   shuffle(passiveQueue);
   passiveRetry = [];
   passiveCorrect = 0;
-  passiveTotal = 0;
-  showScreen("passive");
-  askNextPassive();
+  passiveRetries = 0;
 }
 
+// ===================== Shuffle =====================
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+// ===================== Ask Next Passive =====================
 function askNextPassive() {
   if (passiveQueue.length === 0) {
     if (passiveRetry.length > 0) {
@@ -213,7 +234,7 @@ function askNextPassive() {
 
   const q = passiveQueue[0];
   document.getElementById("question-text").textContent = q.q;
-  document.getElementById("question-progress").textContent = `Question ${passiveTotal + 1} / ${passiveQuestions.length}`;
+  document.getElementById("question-progress").textContent = `Question ${passiveCorrect + 1} / ${passiveQuestions.length}`;
 
   const choiceBox = document.getElementById("choices");
   choiceBox.innerHTML = "";
@@ -240,28 +261,25 @@ function askNextPassive() {
   }, 1000);
 }
 
+// ===================== Handle Selection =====================
 function handlePassiveSelection(selectedBtn, choice, question) {
   clearInterval(passiveTimer);
 
   const buttons = document.querySelectorAll("#choices button");
   buttons.forEach(btn => {
     btn.disabled = true;
-    // Remove previous visual states if needed
     btn.classList.remove("selected", "correct", "wrong");
   });
 
-  // Mark the clicked button
   selectedBtn.classList.add("selected");
 
   if (choice === question.a) {
     selectedBtn.classList.add("correct");
-    passiveCorrect++;
     passiveQueue.shift();
-    passiveTotal++;
+    passiveCorrect++;
   } else {
     selectedBtn.classList.add("wrong");
 
-    // Highlight the correct option
     buttons.forEach(btn => {
       if (btn.textContent === question.a) {
         btn.classList.add("correct");
@@ -269,12 +287,13 @@ function handlePassiveSelection(selectedBtn, choice, question) {
     });
 
     passiveRetry.push(passiveQueue.shift());
-    // Do not increase total on incorrect
+    passiveRetries++; // count retry
   }
 
   setTimeout(askNextPassive, 1200);
 }
 
+// ===================== Handle Timeout =====================
 function handleTimeOutPassive(question) {
   const buttons = document.querySelectorAll("#choices button");
   buttons.forEach(btn => {
@@ -287,15 +306,25 @@ function handleTimeOutPassive(question) {
   });
 
   passiveRetry.push(passiveQueue.shift());
+  passiveRetries++; // count retry
 
   setTimeout(askNextPassive, 1200);
 }
 
+// ===================== Show Results =====================
 function showPassiveResults() {
-  showScreen("result");
-  document.getElementById("results-summary").innerHTML = `
-    ✅ Finished Passive Voice!<br>
-    Correct: ${passiveCorrect} / ${passiveQuestions.length}<br>
-    Retries: ${passiveRetry.length}
+  document.getElementById("passive-game").classList.remove("active");
+  document.getElementById("result-screen").classList.add("active");
+
+  const summary = `
+    ✅ Correct: ${passiveCorrect} / ${passiveQuestions.length}<br>
+    🔁 Extra Attempts: ${passiveRetries}
   `;
+  document.getElementById("results-summary").innerHTML = summary;
+}
+
+// ===================== Back to Home =====================
+function goHome() {
+  document.querySelectorAll(".game-screen, .result-screen, .home").forEach(s => s.classList.remove("active"));
+  document.getElementById("home").classList.add("active");
 }

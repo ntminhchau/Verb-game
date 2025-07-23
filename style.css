@@ -34,17 +34,7 @@ h1, h2 {
 
 .game-buttons button,
 .result-screen button,
-#choices button {
-  padding: 0.75rem 1.5rem;
-  margin: 1rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 5px;
-  background-color: #3498db;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+
 
 button:hover {
   background-color: #2980b9;
@@ -90,7 +80,7 @@ input[type="text"] {
   margin: 5px;
   border: 1px solid #ccc;
   background-color: white;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .choice-btn.selected {

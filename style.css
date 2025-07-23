@@ -98,4 +98,24 @@ input[type="text"] {
   color: white;
 }
 
+.mode-btn {
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 12px 24px;
+  margin: 10px;
+  background: linear-gradient(145deg, #ffcc70, #ff8c8c); /* fun gradient */
+  color: #3a0ca3; /* playful purple text */
+  border: none;
+  border-radius: 25px; /* pill shape */
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Comic Sans MS', 'Baloo 2', cursive;
+}
+
+.mode-btn:hover {
+  background: linear-gradient(145deg, #ffe177, #ffa5a5); /* lighter hover */
+  transform: scale(1.1) rotate(-1deg); /* playful bounce effect */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.25);
+}
 

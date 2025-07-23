@@ -74,7 +74,6 @@ let correctCount = 0;
 let timer;
 let retryList = [];
 let totalRetries = 0;
-let totalTime = 0;
 
 function initParticipleGame() {
   partQuestions = [...verbList];
@@ -83,7 +82,6 @@ function initParticipleGame() {
   currentIndex = 0;
   retryList = [];
   totalRetries = 0;
-  totalTime = 0;
   showScreen("participle");
   askNextParticiple();
 }
@@ -147,7 +145,11 @@ function checkAnswer() {
 
 function showParticipleResults() {
   showScreen("result");
-  document.getElementById("results-summary").innerHTML = `✅ Finished!<br>Total correct: ${verbList.length}<br>Retries: ${totalRetries}`;
+  document.getElementById("results-summary").innerHTML = `
+    ✅ Finished Past Participle!<br>
+    Total correct: ${verbList.length}<br>
+    Retries: ${totalRetries}
+  `;
 }
 
 function shuffle(array) {
@@ -158,6 +160,7 @@ function shuffle(array) {
   return array;
 }
 
+// -------------- Passive Voice Game --------------
 const passiveQuestions = [
   { q: "The documents ______ to the office yesterday.", a: "were brought", choices: ["are brought", "were brought", "brought", "had bring"] },
   { q: "A new bridge ______ across the river.", a: "has been built", choices: ["has been built", "was grow", "is building", "had build"] },
@@ -281,11 +284,9 @@ function handleTimeOutPassive(question) {
 
 function showPassiveResults() {
   showScreen("result");
-  // Align with participle game reporting style (total correct, total questions, retries)
   document.getElementById("results-summary").innerHTML = `
     ✅ Finished Passive Voice!<br>
     Correct: ${passiveCorrect} / ${passiveQuestions.length}<br>
     Retries: ${passiveRetry.length}
   `;
 }
-

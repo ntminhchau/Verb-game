@@ -37,7 +37,7 @@ h1, h2 {
 
 
 button:hover {
-  background-color: #2980b9;
+  background-color: #cce5ff;
 }
 
 input[type="text"] {
@@ -78,13 +78,14 @@ input[type="text"] {
 .choice-btn {
   padding: 10px;
   margin: 5px;
+  font-size: 1.2rem;
   border: 1px solid #ccc;
   background-color: white;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .choice-btn.selected {
-  background-color: #dcdcdc; /* gray to show it was selected */
+  background-color: #cce5ff; /* gray to show it was selected */
 }
 
 .choice-btn.correct {

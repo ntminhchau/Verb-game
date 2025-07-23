@@ -85,12 +85,26 @@ input[type="text"] {
   margin: 1rem 0;
 }
 
-.choice-btn.selected { background-color: #ddd; }
-.choice-btn.correct { background-color: #4CAF50; color: white; }
-.choice-btn.wrong { background-color: #f44336; color: white; }
-
-.choice-btn:hover:not(:disabled) {
-  background-color: #eee;
-  cursor: pointer;
+.choice-btn {
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  background-color: white;
+  transition: background-color 0.3s;
 }
+
+.choice-btn.selected {
+  background-color: #dcdcdc; /* gray to show it was selected */
+}
+
+.choice-btn.correct {
+  background-color: #4CAF50; /* green */
+  color: white;
+}
+
+.choice-btn.wrong {
+  background-color: #f44336; /* red */
+  color: white;
+}
+
 

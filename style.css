@@ -1,0 +1,86 @@
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: #f0f4f8;
+  color: #333;
+}
+
+main {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+section {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+section.active {
+  display: flex;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h1, h2 {
+  color: #2c3e50;
+}
+
+.game-buttons button,
+.result-screen button,
+#choices button {
+  padding: 0.75rem 1.5rem;
+  margin: 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #3498db;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+input[type="text"] {
+  padding: 0.75rem;
+  font-size: 1rem;
+  width: 80%;
+  margin: 1rem 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.controls {
+  margin-top: 1rem;
+  display: flex;
+  gap: 2rem;
+  font-weight: bold;
+}
+
+#choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+#feedback {
+  margin-top: 1rem;
+  color: red;
+  font-weight: bold;
+}
+
+.result-screen p {
+  font-size: 1.1rem;
+  margin: 1rem 0;
+}

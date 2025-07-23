@@ -318,7 +318,7 @@ function showPassiveResults() {
 
   const summary = `
     ✅ Correct: ${passiveCorrect} / ${passiveQuestions.length}<br>
-    🔁 Extra Attempts: ${passiveRetries}
+    🔁 Retries: ${passiveRetries}
   `;
   document.getElementById("results-summary").innerHTML = summary;
 }

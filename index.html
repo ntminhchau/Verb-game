@@ -2,178 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Past Participle Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 30px;
-      background: #f0f4f8;
-    }
-    #verb {
-      font-size: 2em;
-      margin-bottom: 20px;
-    }
-    input {
-      font-size: 1.5em;
-      padding: 10px;
-      width: 300px;
-      text-align: center;
-    }
-    #score, #message, #timer {
-      margin-top: 20px;
-      font-size: 1.2em;
-    }
-    button, select {
-      margin-top: 30px;
-      padding: 10px 20px;
-      font-size: 1em;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>English Games</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <main id="app">
+    <section class="home active" id="home">
+      <h1>🎓 English Games Hub</h1>
+      <p>Improve your English with fun interactive games!</p>
+      <div class="game-buttons">
+        <button onclick="startGame('participle')">Past Participle Challenge</button>
+        <button onclick="startGame('passive')">Passive Voice Mastery</button>
+      </div>
+    </section>
 
-  <h1>Past Participle Typing Game</h1>
-  <label for="level">Choose Level: </label>
-  <select id="level">
-    <option value="easy">Easy</option>
-    <option value="medium" selected>Medium</option>
-    <option value="hard">Hard</option>
-  </select>
+    <section class="game-screen" id="participle-game">
+      <h2 id="verb-prompt">Verb</h2>
+      <input type="text" id="answer-input" placeholder="Enter past participle..." />
+      <div class="controls">
+        <span id="timer">10</span>
+        <span id="progress">0/0</span>
+      </div>
+      <div id="feedback"></div>
+    </section>
 
-  <div id="verb">loading...</div>
-  <input type="text" id="input" placeholder="Type past participle..." autofocus />
-  <div id="message"></div>
-  <div id="score">Score: 0</div>
-  <div id="timer">Time left: 10s</div>
-  <button onclick="startGame()">Restart Game</button>
+    <section class="game-screen" id="passive-game">
+      <h2 id="question-text">Question text</h2>
+      <div id="choices"></div>
+      <div class="controls">
+        <span id="timer-passive">15</span>
+        <span id="question-progress">Q 1/20</span>
+      </div>
+    </section>
 
-  <audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-  <audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+    <section class="result-screen" id="result-screen">
+      <h2>Game Results</h2>
+      <p id="results-summary"></p>
+      <button onclick="goHome()">🏠 Back to Home</button>
+    </section>
+  </main>
 
-  <script>
-    const verbs = {
-      easy: [
-        { base: 'go', pastParticiple: 'gone' },
-        { base: 'eat', pastParticiple: 'eaten' },
-        { base: 'see', pastParticiple: 'seen' },
-        { base: 'do', pastParticiple: 'done' },
-        { base: 'come', pastParticiple: 'come' },
-        { base: 'be', pastParticiple: 'been' },
-        { base: 'make', pastParticiple: 'made' },
-        { base: 'have', pastParticiple: 'had' },
-        { base: 'take', pastParticiple: 'taken' }
-      ],
-      medium: [
-        { base: 'write', pastParticiple: 'written' },
-        { base: 'break', pastParticiple: 'broken' },
-        { base: 'choose', pastParticiple: 'chosen' },
-        { base: 'drink', pastParticiple: 'drunk' },
-        { base: 'speak', pastParticiple: 'spoken' },
-        { base: 'drive', pastParticiple: 'driven' },
-        { base: 'give', pastParticiple: 'given' },
-        { base: 'know', pastParticiple: 'known' },
-        { base: 'run', pastParticiple: 'run' },
-        { base: 'fall', pastParticiple: 'fallen' }
-      ],
-      hard: [
-        { base: 'arise', pastParticiple: 'arisen' },
-        { base: 'swear', pastParticiple: 'sworn' },
-        { base: 'tear', pastParticiple: 'torn' },
-        { base: 'weave', pastParticiple: 'woven' },
-        { base: 'sink', pastParticiple: 'sunk' },
-        { base: 'freeze', pastParticiple: 'frozen' },
-        { base: 'forsake', pastParticiple: 'forsaken' },
-        { base: 'hide', pastParticiple: 'hidden' },
-        { base: 'shrink', pastParticiple: 'shrunk' },
-        { base: 'cling', pastParticiple: 'clung' }
-      ]
-    };
-
-    let currentVerb = {};
-    let score = 0;
-    let startTime = 0;
-    let timerInterval;
-    let timeLeft = 10;
-
-    const inputBox = document.getElementById('input');
-    const levelSelect = document.getElementById('level');
-    const correctSound = document.getElementById('correctSound');
-    const wrongSound = document.getElementById('wrongSound');
-
-    function getRandomVerb(level) {
-      const list = verbs[level];
-      return list[Math.floor(Math.random() * list.length)];
-    }
-
-    function startGame() {
-      score = 0;
-      document.getElementById('score').textContent = 'Score: 0';
-      nextVerb();
-    }
-
-    function nextVerb() {
-      clearInterval(timerInterval);
-      timeLeft = 10;
-      updateTimer();
-      timerInterval = setInterval(countdown, 1000);
-
-      currentVerb = getRandomVerb(levelSelect.value);
-      document.getElementById('verb').textContent = currentVerb.base;
-      inputBox.value = '';
-      document.getElementById('message').textContent = '';
-      inputBox.focus();
-      startTime = new Date().getTime();
-    }
-
-    function countdown() {
-      timeLeft--;
-      updateTimer();
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        showMessage(`⏰ Time's up! Correct: ${currentVerb.pastParticiple}`);
-        wrongSound.play();
-        setTimeout(nextVerb, 1500);
-      }
-    }
-
-    function updateTimer() {
-      document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
-    }
-
-    function checkAnswer() {
-      const userAnswer = inputBox.value.trim().toLowerCase();
-      const correct = currentVerb.pastParticiple;
-      const now = new Date().getTime();
-      const timeTaken = (now - startTime) / 1000;
-
-      clearInterval(timerInterval);
-
-      if (userAnswer === correct) {
-        const points = Math.max(10 - Math.floor(timeTaken), 1);
-        score += points;
-        showMessage(`✅ Correct! +${points} points`);
-        correctSound.play();
-      } else {
-        showMessage(`❌ Wrong! Correct: ${correct}`);
-        wrongSound.play();
-      }
-      document.getElementById('score').textContent = `Score: ${score}`;
-      setTimeout(nextVerb, 1500);
-    }
-
-    function showMessage(text) {
-      document.getElementById('message').textContent = text;
-    }
-
-    inputBox.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        checkAnswer();
-      }
-    });
-
-    window.onload = startGame;
-  </script>
+  <script src="main.js"></script>
 </body>
 </html>

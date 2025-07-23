@@ -158,29 +158,6 @@ function shuffle(array) {
   return array;
 }
 
-const passiveQuestions = [
-  { q: "The documents ______ to the office yesterday.", a: "were brought", choices: ["are brought", "were brought", "brought", "had bring"] },
-  { q: "A new bridge ______ across the river.", a: "has been built", choices: ["has been built", "was grow", "is building", "had build"] },
-  { q: "The homework ______ already ______ by the students.", a: "has / been done", choices: ["is / gave", "has / done", "has / been done", "was / eat"] },
-  { q: "The cake ______ by my sister this morning.", a: "was baked", choices: ["wrote", "was baked", "is draw", "were taken"] },
-  { q: "The email ______ before the meeting started.", a: "had been sent", choices: ["had been sent", "was steal", "has wrote", "is sent"] },
-  { q: "All the money ______ last night.", a: "was stolen", choices: ["was steal", "was stolen", "were lost", "taken"] },
-  { q: "The book ______ into many languages.", a: "has been translated", choices: ["has made", "is speaking", "has been translated", "had thrown"] },
-  { q: "The invitation cards ______ by the designer yesterday.", a: "were designed", choices: ["chosen", "were build", "were designed", "has been written"] },
-  { q: "My phone ______ while I was at the gym.", a: "was lost", choices: ["is lost", "was lost", "were hidden", "had take"] },
-  { q: "All the files ______ carefully before being submitted.", a: "were checked", choices: ["were checked", "was kept", "had catch", "is made"] },
-  { q: "The song ______ by Adele.", a: "was sung", choices: ["is sang", "was sung", "has gave", "sang"] },
-  { q: "The room ______ every day.", a: "is cleaned", choices: ["breaks", "is cleaned", "was known", "has written"] },
-  { q: "All the clothes ______ by the time we arrived.", a: "were folded", choices: ["were found", "were folded", "had taken", "are worn"] },
-  { q: "The results ______ on the website yesterday.", a: "were posted", choices: ["put", "were posted", "has been made", "are sent"] },
-  { q: "The movie ______ in 2001.", a: "was released", choices: ["was released", "has shown", "is given", "made"] },
-  { q: "A message ______ on the board.", a: "was left", choices: ["left", "was left", "is grown", "has eat"] },
-  { q: "The thief ______ by the police last night.", a: "was caught", choices: ["caught", "is caught", "was caught", "has throw"] },
-  { q: "The final decision ______ yet.", a: "has not been made", choices: ["has not been made", "is not taken", "has not wrote", "did not write"] },
-  { q: "All the cookies ______ before we arrived.", a: "had been eaten", choices: ["are eaten", "had been eaten", "have took", "was wore"] },
-  { q: "These problems ______ seriously by the team.", a: "are being considered", choices: ["is considered", "has been taken", "are being considered", "were being win"] },
-];
-
 let passiveIndex = 0;
 let passiveRetry = [];
 let passiveCorrect = 0;
@@ -213,13 +190,14 @@ function askNextPassive() {
 
   const q = passiveQuestions[passiveIndex];
   document.getElementById("question-text").textContent = q.q;
-  document.getElementById("question-progress").textContent = `Q ${passiveIndex + 1}/20`;
+  document.getElementById("question-progress").textContent = `Q ${passiveCorrect + 1}/20`;
 
   const choiceBox = document.getElementById("choices");
   choiceBox.innerHTML = "";
   q.choices.forEach(choice => {
     const btn = document.createElement("button");
     btn.textContent = choice;
+    btn.className = "";
     btn.onclick = () => handlePassiveSelection(btn, choice);
     choiceBox.appendChild(btn);
   });
@@ -234,10 +212,12 @@ function askNextPassive() {
       clearInterval(passiveTimer);
       passiveRetries++;
       passiveRetry.push(q);
+      // Disable buttons
+      document.querySelectorAll("#choices button").forEach(b => b.disabled = true);
       setTimeout(() => {
         passiveIndex++;
         askNextPassive();
-      }, 800);
+      }, 1000);
     }
   }, 1000);
 }
@@ -247,18 +227,20 @@ function handlePassiveSelection(btn, choice) {
   const q = passiveQuestions[passiveIndex];
   const buttons = document.querySelectorAll("#choices button");
   buttons.forEach(b => b.disabled = true);
-  btn.style.backgroundColor = (choice === q.a) ? "lightgreen" : "lightcoral";
+  btn.classList.add("selected");
 
   if (choice === q.a) {
+    btn.classList.add("correct");
     passiveCorrect++;
     passiveIndex++;
     setTimeout(askNextPassive, 800);
   } else {
+    btn.classList.add("wrong");
     passiveRetries++;
     passiveRetry.push(q);
-    // Highlight correct answer
+    // Show correct answer
     buttons.forEach(b => {
-      if (b.textContent === q.a) b.style.backgroundColor = "lightgreen";
+      if (b.textContent === q.a) b.classList.add("correct");
     });
     setTimeout(() => {
       passiveIndex++;
@@ -269,5 +251,6 @@ function handlePassiveSelection(btn, choice) {
 
 function showPassiveResults() {
   showScreen("result");
-  document.getElementById("results-summary").innerHTML = `✅ Finished Passive Voice!<br>Correct: ${passiveCorrect}/20<br>Retries: ${passiveRetries}`;
+  document.getElementById("results-summary").innerHTML =
+    `✅ Finished Passive Voice!<br>Correct: ${passiveCorrect}/20<br>Retries: ${passiveRetries}`;
 }

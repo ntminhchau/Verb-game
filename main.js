@@ -161,7 +161,7 @@ function shuffle(array) {
 const passiveQuestions = [
   { q: "The documents ______ to the office yesterday.", a: "were brought", choices: ["are brought", "were brought", "brought", "had bring"] },
   { q: "A new bridge ______ across the river.", a: "has been built", choices: ["has been built", "was grow", "is building", "had build"] },
-  { q: "The homework ______ already ______ by the students.", a: "has been / done", choices: ["is / gave", "has / done", "has been / done", "was / eat"] },
+  { q: "The homework ______ already ______ by the students.", a: "has / been done", choices: ["is / gave", "has / done", "has / been done", "was / eat"] },
   { q: "The cake ______ by my sister this morning.", a: "was baked", choices: ["wrote", "was baked", "is draw", "were taken"] },
   { q: "The email ______ before the meeting started.", a: "had been sent", choices: ["had been sent", "was steal", "has wrote", "is sent"] },
   { q: "All the money ______ last night.", a: "was stolen", choices: ["was steal", "was stolen", "were lost", "taken"] },
@@ -220,7 +220,7 @@ function askNextPassive() {
   q.choices.forEach(choice => {
     const btn = document.createElement("button");
     btn.textContent = choice;
-    btn.onclick = () => checkPassiveAnswer(choice);
+    btn.onclick = () => handlePassiveSelection(btn, choice);
     choiceBox.appendChild(btn);
   });
 
@@ -234,23 +234,37 @@ function askNextPassive() {
       clearInterval(passiveTimer);
       passiveRetries++;
       passiveRetry.push(q);
-      passiveIndex++;
-      askNextPassive();
+      setTimeout(() => {
+        passiveIndex++;
+        askNextPassive();
+      }, 800);
     }
   }, 1000);
 }
 
-function checkPassiveAnswer(choice) {
+function handlePassiveSelection(btn, choice) {
   clearInterval(passiveTimer);
   const q = passiveQuestions[passiveIndex];
+  const buttons = document.querySelectorAll("#choices button");
+  buttons.forEach(b => b.disabled = true);
+  btn.style.backgroundColor = (choice === q.a) ? "lightgreen" : "lightcoral";
+
   if (choice === q.a) {
     passiveCorrect++;
+    passiveIndex++;
+    setTimeout(askNextPassive, 800);
   } else {
     passiveRetries++;
     passiveRetry.push(q);
+    // Highlight correct answer
+    buttons.forEach(b => {
+      if (b.textContent === q.a) b.style.backgroundColor = "lightgreen";
+    });
+    setTimeout(() => {
+      passiveIndex++;
+      askNextPassive();
+    }, 1500);
   }
-  passiveIndex++;
-  setTimeout(askNextPassive, 800);
 }
 
 function showPassiveResults() {

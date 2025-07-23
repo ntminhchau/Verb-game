@@ -242,9 +242,15 @@ function askNextPassive() {
 
 function handlePassiveSelection(selectedBtn, choice, question) {
   clearInterval(passiveTimer);
-  const buttons = document.querySelectorAll("#choices button");
-  buttons.forEach(btn => btn.disabled = true);
 
+  const buttons = document.querySelectorAll("#choices button");
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    // Remove previous visual states if needed
+    btn.classList.remove("selected", "correct", "wrong");
+  });
+
+  // Mark the clicked button
   selectedBtn.classList.add("selected");
 
   if (choice === question.a) {
@@ -252,7 +258,6 @@ function handlePassiveSelection(selectedBtn, choice, question) {
     passiveCorrect++;
     passiveQueue.shift();
     passiveTotal++;
-    setTimeout(askNextPassive, 1200);
   } else {
     selectedBtn.classList.add("wrong");
 
@@ -263,27 +268,25 @@ function handlePassiveSelection(selectedBtn, choice, question) {
       }
     });
 
-    // Push to retry but do not update total yet
     passiveRetry.push(passiveQueue.shift());
-
-    setTimeout(askNextPassive, 1200);
+    // Do not increase total on incorrect
   }
+
+  setTimeout(askNextPassive, 1200);
 }
 
 function handleTimeOutPassive(question) {
   const buttons = document.querySelectorAll("#choices button");
-  buttons.forEach(btn => btn.disabled = true);
-
-  // Show correct answer
   buttons.forEach(btn => {
+    btn.disabled = true;
+    btn.classList.remove("selected", "correct", "wrong");
+
     if (btn.textContent === question.a) {
       btn.classList.add("correct");
     }
   });
 
-  // Push to retry queue
   passiveRetry.push(passiveQueue.shift());
-  // Do NOT increment passiveTotal yet
 
   setTimeout(askNextPassive, 1200);
 }
